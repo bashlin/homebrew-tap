@@ -52,7 +52,7 @@ brew untap bashlin/tap
 <!-- BEGIN CASK TABLE -->
 | 名称 | 主页 | 对应脚本 | 版本号 | 更新日期 |
 | --- | --- | --- | --- | --- |
-| AltTab | [github.com/Korel/alt-tab-macos](https://github.com/Korel/alt-tab-macos) | [Casks/alt-tab-full.rb](Casks/alt-tab-full.rb) | 11.4.3 | 2026-07-11 |
+| AltTab | [github.com/Korel/alt-tab-macos](https://github.com/Korel/alt-tab-macos) | [Casks/alt-tab-full.rb](Casks/alt-tab-full.rb) | 11.4.3 | 2026-07-14 |
 <!-- END CASK TABLE -->
 
 ## 文档
