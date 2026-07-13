@@ -1,0 +1,40 @@
+name: Bump Casks
+
+# 每天巡检一次:用 brew livecheck 检测 Casks/*.rb 是否过期,
+# 自动下载新版本、计算 sha256、改写 cask 脚本后直接推送到 main。
+#
+# 时区换算:cron 使用 UTC。
+#   "7 21 * * *" = UTC 21:07 = 北京时间(CST, UTC+8)次日 05:07
+# 取 07 分而非整点,避开 GitHub Actions cron 整点拥堵。
+on:
+  schedule:
+    - cron: "7 21 * * *"
+  workflow_dispatch: # 支持手动触发,便于调试
+
+permissions:
+  contents: write # 允许 GITHUB_TOKEN 直接推送到 main
+
+# 同一时刻只跑一个巡检任务,避免并发提交冲突
+concurrency:
+  group: bump-casks
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: macos-latest # 必须 macOS runner:brew 原生可用
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Link tap into Homebrew
+        # brew 要求 tap 必须在 Library/Taps/<owner>/<repo> 下才被识别。
+        # 用自动变量替代硬编码 owner/repo,fork 或改名后无需改此处。
+        run: |
+          mkdir -p "$(brew --repository)/Library/Taps/${{ github.repository_owner }}"
+          ln -s "$GITHUB_WORKSPACE" "$(brew --repository)/Library/Taps/${{ github.repository_owner }}/${{ github.event.repository.name }}"
+
+      - name: Detect & bump outdated casks
+        env:
+          # github_releases 策略走 GitHub API,注入 token 避免限流(60/h -> 1000/h)
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: bash .github/scripts/bump-outdated-casks.sh
