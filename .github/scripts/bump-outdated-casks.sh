@@ -73,9 +73,21 @@ for cask_file in "$CASKS_DIR"/*.rb; do
   echo "::endgroup::"
 done
 
-if [[ "$bumped" -gt 0 ]]; then
+# 同步 README 的 cask 列表表格:
+# 此时各 cask 的 commit 已在上方循环内完成,git log 能读到最新日期,
+# 故本次被升级的 cask 在表格中会显示今天的日期。
+ruby "$TAP_DIR/.github/scripts/update_readme.rb"
+readme_updated=0
+if ! git diff --quiet -- README.md; then
+  git add README.md
+  git commit -m "docs: 同步 README cask 列表" >/dev/null
+  readme_updated=1
+fi
+
+if [[ "$bumped" -gt 0 || "$readme_updated" -eq 1 ]]; then
   git push
-  echo "✅ 已推送 $bumped 个 cask 更新到 main"
+  [[ "$bumped" -gt 0 ]] && echo "✅ 已推送 $bumped 个 cask 更新到 main"
+  [[ "$readme_updated" -eq 1 ]] && echo "📝 已更新 README 表格"
 else
   echo "ℹ️ 无过期 cask 需更新"
 fi
