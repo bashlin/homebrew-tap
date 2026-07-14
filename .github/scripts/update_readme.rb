@@ -34,8 +34,10 @@ rows = cask_files.map do |file|
   end
 
   rel   = file.relative_path_from(tap_dir).to_s
-  # 最近一次提交日期(YYYY-MM-DD);未提交过的新文件回退为 "-"
-  date  = `git -C "#{tap_dir}" log -1 --format=%cd --date=short -- "#{rel}" 2>/dev/null`.strip
+  # 最近一次"version 行变更"的提交日期,严格反映版本变更:
+  # -G 只匹配 diff 中增删了 version 行的提交,故改 desc/zap 等非版本行
+  # 的提交不会改动此日期。未提交过的新文件回退为 "-"。
+  date  = `git -C "#{tap_dir}" log -1 --format=%cd --date=short -G '^[[:space:]]*version[[:space:]]' -- "#{rel}" 2>/dev/null`.strip
   date  = "-" if date.empty?
 
   # 主页链接文本去掉协议前缀,与原 README 风格一致
