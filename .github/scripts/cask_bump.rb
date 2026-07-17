@@ -19,9 +19,15 @@ content = File.read(file)
 tmpl = content[/^\s*url\s+"((?:[^"\\]|\\.)*)"/m, 1] \
   or abort "无法从 #{file} 解析 url 模板"
 
-# 兼容 #{version} 及常见的 #{version.major} / minor / patch / major_minor
-major, minor, patch = new_ver.split(".")
+# 兼容 CSV version 及常见的 version 派生方法。
+csv_parts = new_ver.split(",", -1)
+primary_version = csv_parts.first
+major, minor, patch = primary_version.split(".")
 url = tmpl
+%w[first second third fourth fifth].each_with_index do |name, index|
+  url.gsub!("\#{version.csv.#{name}}", csv_parts[index].to_s)
+end
+url = url
   .gsub('#{version.major}',      major.to_s)
   .gsub('#{version.minor}',      minor.to_s)
   .gsub('#{version.patch}',      patch.to_s)
