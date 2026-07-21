@@ -1,6 +1,6 @@
 cask "x1a0he-wechat-plugin" do
-  version "2.6.2,4.1.11.54,41754"
-  sha256 "707cd62d1cead5e9d5bd51b0d6c9896bec465607b0530e0b9881ac1434b56ea6"
+  version "2.6.4,4.1.12.22,42530"
+  sha256 "f675514fe2ac7d6e6401899cf7013a5081b192d2cd9597e5a479e6f7c0131a9e"
 
   url "https://github.com/X1a0He/X1a0HeWeChatPlugin/releases/download/#{version.csv.first}/X1a0HeWeChatPlugin.pkg"
   name "X1a0He WeChat Plugin"
@@ -12,10 +12,11 @@ cask "x1a0he-wechat-plugin" do
     regex(/^v?(\d+(?:\.\d+)+)$/i)
     strategy :github_latest do |json, regex|
       plugin_version = json["tag_name"]&.[](regex, 1)
-      wechat_match = json["body"]&.match(/\u652f\u6301\s+v?(\d+(?:\.\d+)+)\s*\((\d+)\)/i)
-      next if plugin_version.blank? || wechat_match.blank?
+      wechat_versions = json["body"]&.scan(/\u652f\u6301\s+v?(\d+(?:\.\d+)+)\s*\((\d+)\)/i)
+      latest_wechat = wechat_versions&.last
+      next if plugin_version.blank? || latest_wechat.blank?
 
-      "#{plugin_version},#{wechat_match[1]},#{wechat_match[2]}"
+      "#{plugin_version},#{latest_wechat[0]},#{latest_wechat[1]}"
     end
   end
 

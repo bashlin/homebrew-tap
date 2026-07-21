@@ -34,14 +34,14 @@ url = url
   .gsub('#{version.major_minor}', "#{major}.#{minor}")
   .gsub('#{version}',            new_ver)
 
-puts "下载: #{url}"
+warn "下载: #{url}"
 Dir.mktmpdir do |dir|
   tmp = File.join(dir, "pkg")
   # User-Agent 部分服务器要求;此处统一带上
   IO.copy_stream(URI.open(url, "r", "User-Agent" => "brew-bump/1.0"), tmp)
 
   sha = Digest::SHA256.file(tmp).hexdigest
-  puts "sha256: #{sha}"
+  warn "sha256: #{sha}"
 
   # 改写 version 与 sha256 两行;保留原有缩进
   unless content.sub!(/^(\s*version\s+)"[^"]*"/, "\\1\"#{new_ver}\"")

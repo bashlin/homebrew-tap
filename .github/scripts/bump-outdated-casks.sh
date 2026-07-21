@@ -27,19 +27,56 @@ for cask_file in "$CASKS_DIR"/*.rb; do
   cask="$(basename "$cask_file" .rb)"
   echo "::group::cask: $cask"
 
-  json="$(brew livecheck --cask "$cask" --json 2>/dev/null || true)"
+  if ! json="$(brew livecheck --cask "$cask" --json)"; then
+    echo "livecheck 执行失败"
+    failed=$((failed + 1))
+    echo "::endgroup::"
+    continue
+  fi
   if [[ -z "$json" ]]; then
-    echo "livecheck 无输出,跳过"
+    echo "livecheck 无输出"
+    failed=$((failed + 1))
     echo "::endgroup::"
     continue
   fi
 
-  status="$(printf '%s' "$json" | jq -r --arg c "$cask" '.[$c].status // empty')"
-  latest="$(printf '%s' "$json" | jq -r --arg c "$cask" '.[$c].latest // empty')"
-  current="$(printf '%s' "$json" | jq -r --arg c "$cask" '.[$c].current // empty')"
+  # Homebrew 6 返回数组且版本字段位于 `.version`;同时兼容旧版对象格式。
+  if ! record="$(printf '%s' "$json" | jq -c --arg c "$cask" '
+    if type == "array" then
+      (first(.[] | select(.cask == $c)) // {})
+    elif type == "object" then
+      (.[$c] // {})
+    else
+      {}
+    end
+  ')"; then
+    echo "livecheck JSON 解析失败"
+    failed=$((failed + 1))
+    echo "::endgroup::"
+    continue
+  fi
 
-  if [[ "$status" != "outdated" ]]; then
-    echo "状态=$status (current=$current latest=$latest),跳过"
+  current="$(printf '%s' "$record" | jq -r '.version.current // .current // empty')"
+  latest="$(printf '%s' "$record" | jq -r '.version.latest // .latest // empty')"
+  outdated="$(printf '%s' "$record" | jq -r '
+    if .version.outdated != null then
+      .version.outdated
+    elif .status != null then
+      .status == "outdated"
+    else
+      false
+    end
+  ')"
+
+  if [[ -z "$current" || -z "$latest" ]]; then
+    echo "livecheck JSON 缺少版本字段"
+    failed=$((failed + 1))
+    echo "::endgroup::"
+    continue
+  fi
+
+  if [[ "$outdated" != "true" ]]; then
+    echo "状态=最新 (current=$current latest=$latest),跳过"
     echo "::endgroup::"
     continue
   fi
@@ -51,6 +88,7 @@ for cask_file in "$CASKS_DIR"/*.rb; do
   if ! new_sha="$(ruby "$TAP_DIR/.github/scripts/cask_bump.rb" "$cask_file" "$latest" 2>"$err_log")"; then
     echo "下载/改写失败:"
     cat "$err_log"
+    rm -f "$err_log"
     git checkout -- "$cask_file" 2>/dev/null || true
     failed=$((failed + 1))
     echo "::endgroup::"
@@ -94,4 +132,5 @@ fi
 
 if [[ "$failed" -gt 0 ]]; then
   echo "⚠️ $failed 个 cask 更新失败,详见上方日志"
+  exit 1
 fi
