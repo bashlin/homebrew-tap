@@ -3,6 +3,12 @@ name: Bump Casks
 # 每天巡检一次:用 brew livecheck 检测 Casks/*.rb 是否过期,
 # 自动下载新版本、计算 sha256、改写 cask 脚本后直接推送到 main。
 #
+# 何时算失败(由 .github/scripts/bump-outdated-casks.sh 的退出码决定):
+#   - 全部最新 / 没有需要更新的 cask        -> 成功
+#   - livecheck 探测不出版本(限流、网络、
+#     上游 release 格式变化等)             -> 成功 + ::warning:: 注解
+#   - 探测到新版本但下载/改写/校验失败      -> 失败,需人工介入
+#
 # 时区换算:cron 使用 UTC。
 #   "7 21 * * *" = UTC 21:07 = 北京时间(CST, UTC+8)次日 05:07
 # 取 07 分而非整点,避开 GitHub Actions cron 整点拥堵。
@@ -24,6 +30,12 @@ jobs:
     runs-on: macos-latest # 必须 macOS runner:brew 原生可用
     steps:
       - uses: actions/checkout@v4
+        with:
+          # 必须取全量历史:update_readme.rb 用 `git log -G '^version'` 推算
+          # 各 cask 的"更新日期"。默认的 depth=1 浅克隆只有一个提交,
+          # 会把所有 cask 的日期都算成最后一次提交的日期,并导致每次巡检
+          # 都产生一条无意义的 README 同步提交。
+          fetch-depth: 0
 
       - name: Link tap into Homebrew
         # brew 要求 tap 必须在 Library/Taps/<owner>/<repo> 下才被识别。
