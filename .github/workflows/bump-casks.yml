@@ -44,6 +44,16 @@ jobs:
           mkdir -p "$(brew --repository)/Library/Taps/${{ github.repository_owner }}"
           ln -s "$GITHUB_WORKSPACE" "$(brew --repository)/Library/Taps/${{ github.repository_owner }}/${{ github.event.repository.name }}"
 
+      - name: Trust tap
+        # Homebrew 6 默认要求非官方 tap 须显式信任,否则 livecheck 等命令拒绝
+        # 加载 cask (UntrustedTapError: "Refusing to load cask ... from untrusted
+        # tap")。CI 的 symlink tap 不在 runner 的 ~/.homebrew/trust.json 中,
+        # 必须先信任 livecheck/bump 才能正常工作。
+        run: |
+          TAP_REPO="${{ github.event.repository.name }}"
+          TAP_NAME="${{ github.repository_owner }}/${TAP_REPO#homebrew-}"
+          brew trust --tap "$TAP_NAME"
+
       - name: Detect & bump outdated casks
         env:
           # github_releases 策略走 GitHub API,注入 token 避免限流(60/h -> 1000/h)
