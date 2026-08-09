@@ -29,7 +29,7 @@ jobs:
   bump:
     runs-on: macos-latest # 必须 macOS runner:brew 原生可用
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # 必须取全量历史:update_readme.rb 用 `git log -G '^version'` 推算
           # 各 cask 的"更新日期"。默认的 depth=1 浅克隆只有一个提交,
