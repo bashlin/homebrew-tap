@@ -1,6 +1,6 @@
 cask "alt-tab-full" do
-  version "11.4.4"
-  sha256 "cd472cf0825e9af679a22b9d6c74908dd09aa6f225db4c7d188cc5efd4a587d8"
+  version "11.5.0"
+  sha256 "330008659381b118c581f9b468b29b1f5f00ff29564be27c7d5e06876d649b92"
 
   url "https://github.com/Korel/alt-tab-macos/releases/download/fork-v#{version}/AltTab-#{version}-unsigned.dmg",
       verified: "github.com/Korel/alt-tab-macos/"
