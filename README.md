@@ -53,7 +53,7 @@ brew untap bashlin/tap
 | 名称 | 主页 | 对应脚本 | 版本号 | 更新日期 |
 | --- | --- | --- | --- | --- |
 | AltTab | [github.com/Korel/alt-tab-macos](https://github.com/Korel/alt-tab-macos) | [Casks/alt-tab-full.rb](Casks/alt-tab-full.rb) | 11.5.0 | 2026-08-20 |
-| X1a0He WeChat Plugin | [github.com/X1a0He/X1a0HeWeChatPlugin](https://github.com/X1a0He/X1a0HeWeChatPlugin) | [Casks/x1a0he-wechat-plugin.rb](Casks/x1a0he-wechat-plugin.rb) | 2.8.2,4.1.13.10,269578 | 2026-08-21 |
+| X1a0He WeChat Plugin | [github.com/X1a0He/X1a0HeWeChatPlugin](https://github.com/X1a0He/X1a0HeWeChatPlugin) | [Casks/x1a0he-wechat-plugin.rb](Casks/x1a0he-wechat-plugin.rb) | 2.8.3,4.1.13.51,269619 | 2026-09-01 |
 <!-- END CASK TABLE -->
 
 ## 文档
