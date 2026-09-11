@@ -2,8 +2,7 @@ cask "alt-tab-full" do
   version "11.6.0"
   sha256 "a2fb9c442f1231fad5b98e1320c39a661901eaa57c2f6d6642a6b880b443e7c6"
 
-  url "https://github.com/Korel/alt-tab-macos/releases/download/fork-v#{version}/AltTab-#{version}-unsigned.dmg",
-      verified: "github.com/Korel/alt-tab-macos/"
+  url "https://github.com/Korel/alt-tab-macos/releases/download/fork-v#{version}/AltTab-#{version}-unsigned.dmg"
   name "AltTab"
   desc "Enable Windows-like alt-tab (unsigned)"
   homepage "https://github.com/Korel/alt-tab-macos"
