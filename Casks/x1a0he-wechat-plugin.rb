@@ -1,6 +1,6 @@
 cask "x1a0he-wechat-plugin" do
-  version "2.9.0,4.1.13.56,269624"
-  sha256 "10ac8ebe733b1caa0d1425be9247243d564d5282638bc46a07a02fa395cb230e"
+  version "2.12.0,4.1.15.72,270152"
+  sha256 "a80f717f4b76315ef83dcef5b7c1f8a0914e700c5f57a594e0a26a279bd8c78c"
 
   url "https://github.com/X1a0He/X1a0HeWeChatPlugin/releases/download/#{version.csv.first}/X1a0HeWeChatPlugin.pkg"
   name "X1a0He WeChat Plugin"
